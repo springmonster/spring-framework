@@ -217,8 +217,14 @@ public class ScheduledAnnotationBeanPostProcessor
 			this.beanFactory = applicationContext;
 		}
 	}
-
-
+	
+	/**
+	 * kuanghc1：
+	 * 任务注册到ScheduledTaskRegistrar之后，我们就要运行它们。触发操作会在下面2个回调方法内触发。
+	 * afterSingletonsInstantiated和名字一样，会等所有Singleton类型的bean实例化后触发。
+	 * onApplicationEvent会等ApplicationContext完成refresh后被触发。
+	 *
+	 */
 	@Override
 	public void afterSingletonsInstantiated() {
 		// Remove resolved singleton classes from cache
@@ -229,7 +235,14 @@ public class ScheduledAnnotationBeanPostProcessor
 			finishRegistration();
 		}
 	}
-
+	
+	/**
+	 * kuanghc1：
+	 * 任务注册到ScheduledTaskRegistrar之后，我们就要运行它们。触发操作会在下面2个回调方法内触发。
+	 * afterSingletonsInstantiated和名字一样，会等所有Singleton类型的bean实例化后触发。
+	 * onApplicationEvent会等ApplicationContext完成refresh后被触发。
+	 *
+	 */
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		if (event.getApplicationContext() == this.applicationContext) {
@@ -239,7 +252,10 @@ public class ScheduledAnnotationBeanPostProcessor
 			finishRegistration();
 		}
 	}
-
+	
+	/**
+	 * kuanghc1：这里抽取一些信息
+	 */
 	private void finishRegistration() {
 		if (this.scheduler != null) {
 			this.registrar.setScheduler(this.scheduler);
@@ -360,6 +376,7 @@ public class ScheduledAnnotationBeanPostProcessor
 		}
 
 		Class<?> targetClass = AopProxyUtils.ultimateTargetClass(bean);
+		// kuanghc1:扫描bean内带有Scheduled注解的方法
 		if (!this.nonAnnotatedClasses.contains(targetClass) &&
 				AnnotationUtils.isCandidateClass(targetClass, Arrays.asList(Scheduled.class, Schedules.class))) {
 			Map<Method, Set<Scheduled>> annotatedMethods = MethodIntrospector.selectMethods(targetClass,
@@ -508,6 +525,7 @@ public class ScheduledAnnotationBeanPostProcessor
 			Assert.isTrue(processedSchedule, errorMessage);
 
 			// Finally register the scheduled tasks
+			// kuanghc1:最终加入到Set中
 			synchronized (this.scheduledTasks) {
 				Set<ScheduledTask> regTasks = this.scheduledTasks.computeIfAbsent(bean, key -> new LinkedHashSet<>(4));
 				regTasks.addAll(tasks);

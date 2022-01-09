@@ -342,6 +342,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 
 
 	/**
+	 * kuanghc1: 这里执行
 	 * Calls {@link #scheduleTasks()} at bean construction time.
 	 */
 	@Override
